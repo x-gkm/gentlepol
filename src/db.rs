@@ -24,10 +24,7 @@ pub struct Db(PgPool);
 
 impl Db {
     pub async fn build(url: &str) -> Result<Db, Error> {
-        let pool = PgPoolOptions::new()
-            .max_connections(8)
-            .connect(url)
-            .await?;
+        let pool = PgPoolOptions::new().max_connections(8).connect(url).await?;
 
         Ok(Db(pool))
     }
@@ -49,11 +46,7 @@ impl Db {
         Ok(())
     }
 
-    pub async fn create_user(
-        &self,
-        username: &str,
-        password_hash: String,
-    ) -> Result<(), Error> {
+    pub async fn create_user(&self, username: &str, password_hash: String) -> Result<(), Error> {
         query!(
             "INSERT INTO feed_user (name, password_hash) VALUES ($1, $2)",
             username,
@@ -65,10 +58,7 @@ impl Db {
         Ok(())
     }
 
-    pub async fn get_user_creds_by_name(
-        &self,
-        name: &str,
-    ) -> Result<Option<UserCreds>, Error> {
+    pub async fn get_user_creds_by_name(&self, name: &str) -> Result<Option<UserCreds>, Error> {
         query_as!(
             UserCreds,
             "SELECT id, name, password_hash FROM feed_user WHERE name = $1",
@@ -84,10 +74,7 @@ impl Db {
             .await
     }
 
-    pub async fn get_session_by_token(
-        &self,
-        token: Uuid,
-    ) -> Result<Option<Session>, Error> {
+    pub async fn get_session_by_token(&self, token: Uuid) -> Result<Option<Session>, Error> {
         query_as!(
             Session,
             "SELECT owner, token, valid_until FROM user_session WHERE token = $1",
