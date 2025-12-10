@@ -124,4 +124,18 @@ impl Db {
 
         Ok(())
     }
+
+    pub async fn get_all_web_news_names_by_user_id(
+        &self,
+        user_id: i32,
+    ) -> Result<Vec<String>, Error> {
+        Ok(
+            query!("SELECT name FROM web_news WHERE owner = $1", user_id)
+                .fetch_all(&self.0)
+                .await?
+                .into_iter()
+                .map(|r| r.name)
+                .collect(),
+        )
+    }
 }
