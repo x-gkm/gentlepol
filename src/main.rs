@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, sync::Arc};
 
 use anyhow::anyhow;
 use axum::{
@@ -42,6 +42,7 @@ impl IntoResponse for AppError {
 #[derive(Clone)]
 struct AppState {
     auth: Auth,
+    db: Arc<Db>,
 }
 
 #[derive(Deserialize)]
@@ -101,7 +102,7 @@ impl FromRequestParts<AppState> for User {
 async fn main() -> Result<(), anyhow::Error> {
     _ = dotenvy::dotenv();
 
-    let db = Db::build(&env::var("DATABASE_URL")?).await?;
+    let db = Arc::new(Db::build(&env::var("DATABASE_URL")?).await?);
 
     let router = Router::new()
         .nest(
@@ -111,7 +112,8 @@ async fn main() -> Result<(), anyhow::Error> {
                 .route("/login", post(login_user)),
         )
         .with_state(AppState {
-            auth: Auth::new(db),
+            auth: Auth::new(Arc::clone(&db)),
+            db: Arc::clone(&db),
         });
 
     let listener = TcpListener::bind("0.0.0.0:8080").await?;

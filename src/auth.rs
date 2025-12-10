@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use chrono::{TimeDelta, Utc};
 use uuid::Uuid;
 
@@ -23,11 +25,11 @@ pub enum AuthError {
 
 #[derive(Clone)]
 pub struct Auth {
-    db: Db,
+    db: Arc<Db>,
 }
 
 impl Auth {
-    pub fn new(db: Db) -> Auth {
+    pub fn new(db: Arc<Db>) -> Auth {
         Auth { db }
     }
 
