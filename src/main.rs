@@ -15,8 +15,8 @@ use tokio::net::TcpListener;
 use crate::auth::{Auth, AuthError};
 use crate::db::{Db, User};
 
-mod db;
 mod auth;
+mod db;
 
 struct AppError(anyhow::Error);
 
