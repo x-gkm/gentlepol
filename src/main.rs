@@ -104,8 +104,12 @@ async fn main() -> Result<(), anyhow::Error> {
     let db = Db::build(&env::var("DATABASE_URL")?).await?;
 
     let router = Router::new()
-        .route("/register", post(register_user))
-        .route("/login", post(login_user))
+        .nest(
+            "/auth",
+            Router::new()
+                .route("/register", post(register_user))
+                .route("/login", post(login_user)),
+        )
         .with_state(AppState {
             auth: Auth::new(db),
         });
