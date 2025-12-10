@@ -19,6 +19,19 @@ pub struct Session {
     pub valid_until: DateTime<Utc>,
 }
 
+pub struct WebNews {
+    pub id: i32,
+    pub url: String,
+    pub name: String,
+    pub owner: i32,
+    pub selector_post: Option<String>,
+    pub selector_title: Option<String>,
+    pub selector_link: String,
+    pub selector_description: Option<String>,
+    pub selector_date: Option<String>,
+    pub selector_image: Option<String>,
+}
+
 #[derive(Clone)]
 pub struct Db(PgPool);
 
@@ -82,5 +95,33 @@ impl Db {
         )
         .fetch_optional(&self.0)
         .await
+    }
+
+    pub async fn create_web_news(&self, web_news: &WebNews) -> Result<(), Error> {
+        query!(
+            "INSERT INTO web_news (
+                url,
+                name,
+                owner,
+                selector_post,
+                selector_title,
+                selector_link,
+                selector_description,
+                selector_date,
+                selector_image
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+            web_news.url,
+            web_news.name,
+            web_news.owner,
+            web_news.selector_post,
+            web_news.selector_title,
+            web_news.selector_link,
+            web_news.selector_description,
+            web_news.selector_date,
+            web_news.selector_image,
+        )
+        .execute(&self.0).await?;
+
+        Ok(())
     }
 }
