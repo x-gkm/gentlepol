@@ -80,10 +80,6 @@ async fn login_user(
     }
 }
 
-async fn get_protected(user: User) -> String {
-    format!("you are {}", user.name)
-}
-
 impl FromRequestParts<AppState> for User {
     type Rejection = AppError;
 
@@ -110,7 +106,6 @@ async fn main() -> Result<(), anyhow::Error> {
     let router = Router::new()
         .route("/register", post(register_user))
         .route("/login", post(login_user))
-        .route("/protected", get(get_protected))
         .with_state(AppState {
             auth: Auth::new(db),
         });
