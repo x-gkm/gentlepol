@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS feed_user (
+    id SERIAL NOT NULL PRIMARY KEY,
+    name VARCHAR NOT NULL UNIQUE,
+    password_hash VARCHAR NOT NULL
+)
