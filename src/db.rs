@@ -138,4 +138,10 @@ impl Db {
                 .collect(),
         )
     }
+
+    pub async fn get_web_news_by_name(&self, name: &str) -> Result<Option<WebNews>, Error> {
+        query_as!(WebNews, "SELECT * FROM web_news WHERE name = $1", name)
+            .fetch_optional(&self.0)
+            .await
+    }
 }
