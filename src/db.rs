@@ -120,7 +120,8 @@ impl Db {
             web_news.selector_date,
             web_news.selector_image,
         )
-        .execute(&self.0).await?;
+        .execute(&self.0)
+        .await?;
 
         Ok(())
     }
