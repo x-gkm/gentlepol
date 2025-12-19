@@ -12,7 +12,7 @@ use axum_extra::extract::CookieJar;
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
 
-use crate::auth::{Auth, AuthError};
+use crate::{auth::{Auth, AuthError}, db::WebNews};
 use crate::db::{Db, User};
 
 mod auth;
@@ -168,12 +168,70 @@ async fn list_feeds(
 async fn get_feed(
     State(state): State<AppState>,
     Path(feed): Path<String>,
+    user: User,
 ) -> Result<Json<Feed>, AppError> {
     let Some(web_news) = state.db.get_web_news_by_name(&feed).await? else {
         return Err(anyhow!("no such feed").into());
     };
 
+    if web_news.owner != user.id {
+        //return Err(anyhow!("unauthorized").into());
+        return Err(anyhow!("no such feed").into());
+    }
+
     Ok(Json(web_news.into()))
+}
+
+async fn update_feed(
+    State(state): State<AppState>,
+    Path(feed_name): Path<String>,
+    user: User,
+    Json(feed): Json<Feed>,
+) -> Result<(), AppError> {
+    let Some(web_news) = state.db.get_web_news_by_name(&feed_name).await? else {
+        return Err(anyhow!("no such feed").into());
+    };
+
+    if web_news.owner != user.id {
+        //return Err(anyhow!("unauthorized").into());
+        return Err(anyhow!("no such feed").into());
+    }
+
+    state.db.update_web_news_by_name(&feed_name, &WebNews {
+        // ignored fields
+        id: -1,
+        name: "".into(),
+        owner: -1,
+
+        url: feed.url,
+        selector_post: feed.selectors.post,
+        selector_title: feed.selectors.title,
+        selector_link: feed.selectors.link,
+        selector_description: feed.selectors.description,
+        selector_date: feed.selectors.date,
+        selector_image: feed.selectors.image,
+    }).await?;
+
+    Ok(())
+}
+
+async fn delete_feed(
+    State(state): State<AppState>,
+    Path(feed_name): Path<String>,
+    user: User,
+) -> Result<(), AppError> {
+    let Some(web_news) = state.db.get_web_news_by_name(&feed_name).await? else {
+        return Err(anyhow!("no such feed").into());
+    };
+
+    if web_news.owner != user.id {
+        //return Err(anyhow!("unauthorized").into());
+        return Err(anyhow!("no such feed").into());
+    }
+
+    state.db.delete_web_news_by_name(&feed_name).await?;
+
+    Ok(())
 }
 
 #[tokio::main]
@@ -190,7 +248,10 @@ async fn main() -> Result<(), anyhow::Error> {
                 .route("/login", post(login_user)),
         )
         .route("/feeds", get(list_feeds).post(create_feed))
-        .route("/feeds/{name}", get(get_feed))
+        .route(
+            "/feeds/{name}",
+            get(get_feed).put(update_feed).delete(delete_feed),
+        )
         .with_state(AppState {
             auth: Auth::new(Arc::clone(&db)),
             db: Arc::clone(&db),

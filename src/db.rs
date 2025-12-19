@@ -145,4 +145,42 @@ impl Db {
             .fetch_optional(&self.0)
             .await
     }
+
+    pub async fn delete_web_news_by_name(&self, name: &str) -> Result<(), Error> {
+        query!("DELETE FROM web_news WHERE name = $1", name)
+            .execute(&self.0)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn update_web_news_by_name(
+        &self,
+        name: &str,
+        web_news: &WebNews,
+    ) -> Result<(), Error> {
+        query!(
+            "UPDATE web_news SET
+                url = $2,
+                selector_post = $3,
+                selector_title = $4,
+                selector_link = $5,
+                selector_description = $6,
+                selector_date = $7,
+                selector_image = $8
+            WHERE name = $1",
+            name,
+            web_news.url,
+            web_news.selector_post,
+            web_news.selector_title,
+            web_news.selector_link,
+            web_news.selector_description,
+            web_news.selector_date,
+            web_news.selector_image,
+        )
+        .execute(&self.0)
+        .await?;
+
+        Ok(())
+    }
 }
