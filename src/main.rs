@@ -6,12 +6,13 @@ use axum::{
 };
 use tokio::net::TcpListener;
 
-use crate::{auth::Auth, routes::{AppState, create_feed, delete_feed, get_feed, list_feeds, login_user, register_user, update_feed}};
+use crate::{auth::Auth, feed::FeedManager, routes::{AppState, create_feed, delete_feed, get_feed, list_feeds, login_user, register_user, update_feed}};
 use crate::db::Db;
 
 mod auth;
 mod db;
 mod routes;
+mod feed;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
@@ -33,6 +34,7 @@ async fn main() -> Result<(), anyhow::Error> {
         )
         .with_state(AppState {
             auth: Auth::new(Arc::clone(&db)),
+            feed_manager: FeedManager::new(Arc::clone(&db)),
             db: Arc::clone(&db),
         });
 
