@@ -8,12 +8,12 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::extract::CookieJar;
-use gentlepol::db::{Db, User};
+use gentlepol::{Feed, db::{Db, User}};
 use serde::Deserialize;
 
 use crate::{
     auth::{Auth, AuthError},
-    feed::{Feed, FeedManager},
+    feed::FeedManager,
 };
 
 pub struct AppError(anyhow::Error);
