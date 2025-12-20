@@ -1,4 +1,7 @@
+use std::pin::Pin;
+
 use chrono::{DateTime, Utc};
+use futures::Stream;
 use sqlx::{Error, PgPool, postgres::PgPoolOptions, query, query_as};
 use uuid::Uuid;
 
@@ -19,6 +22,7 @@ pub struct Session {
     pub valid_until: DateTime<Utc>,
 }
 
+#[derive(Debug)]
 pub struct WebNews {
     pub id: i32,
     pub url: String,
@@ -182,5 +186,9 @@ impl Db {
         .await?;
 
         Ok(())
+    }
+
+    pub fn get_all_web_news(&self) -> Pin<Box<dyn Stream<Item = Result<WebNews, sqlx::Error>> + Send + '_>> {
+        query_as!(WebNews, "SELECT * FROM web_news").fetch(&self.0)
     }
 }
