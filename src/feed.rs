@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
-use crate::db::{Db, WebNews};
+use gentlepol::db::{Db, WebNews};
 
 #[derive(Debug, thiserror::Error)]
 pub enum FeedError {

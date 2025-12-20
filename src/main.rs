@@ -7,10 +7,9 @@ use axum::{
 use tokio::net::TcpListener;
 
 use crate::{auth::Auth, feed::FeedManager, routes::{AppState, create_feed, delete_feed, get_feed, list_feeds, login_user, register_user, update_feed}};
-use crate::db::Db;
+use gentlepol::db::Db;
 
 mod auth;
-mod db;
 mod routes;
 mod feed;
 

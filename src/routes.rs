@@ -8,11 +8,11 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::extract::CookieJar;
+use gentlepol::db::{Db, User};
 use serde::Deserialize;
 
 use crate::{
     auth::{Auth, AuthError},
-    db::{Db, User},
     feed::{Feed, FeedManager},
 };
 

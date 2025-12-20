@@ -3,7 +3,7 @@ use std::sync::Arc;
 use chrono::{TimeDelta, Utc};
 use uuid::Uuid;
 
-use crate::db::{Db, User};
+use gentlepol::db::{Db, User};
 
 #[derive(Debug, thiserror::Error)]
 pub enum AuthError {
